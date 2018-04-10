@@ -183,7 +183,7 @@ query
 
 insertClause
   : INSERT priority_opt ignore_opt
-      into_opt identifier
+      into_opt simple_table_factor
     partitionOpt
     insert_cols
     insert_source
@@ -681,8 +681,11 @@ index_hint
   | IGNORE index_or_key for_opt '(' identifier_list ')' { $$ = { type: 'IgnoreIndexHint', value: $5, forOpt: $3, indexOrKey: $2 } }
   | FORCE index_or_key for_opt '(' identifier_list ')' { $$ = { type: 'ForceIndexHint', value: $5, forOpt: $3, indexOrKey: $2 } }
   ;
-table_factor
+simple_table_factor
   : identifier partitionOpt aliasOpt index_hint_list_opt { $$ = { type: 'TableFactor', value: $1, partition: $2, alias: $3.alias, hasAs: $3.hasAs, indexHintOpt: $4 } }
+  ;
+table_factor
+  : simple_table_factor
   | '(' selectClause ')' aliasOpt { $$ = { type: 'SubQuery', value: $2, alias: $4.alias, hasAs: $4.hasAs } }
   | '(' table_refrences ')' { $$ = $2; $$.hasParentheses = true }
   ;
